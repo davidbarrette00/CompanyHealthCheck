@@ -2,6 +2,7 @@
 import anthropic
 
 from data import alpha_vantage_service
+from data import chromadb_repository
 
 #https://docs.anthropic.com/claude/docs/quickstart-guide
 
@@ -26,4 +27,20 @@ jirens_key = ""
 #
 # print(message.content)
 
-print(alpha_vantage_service.get_overview("TSLA"))
+# tesla_data = alpha_vantage_service.get_overview("TSLA")
+# print(tesla_data)
+
+db = chromadb_repository.chromaDbRepository
+default_collection = db.create_collection()
+
+db.add_document(
+    collection=default_collection,
+    list_of_documents=["test doc1", "test doc2", "test doc3"])
+
+result = db.query(
+    collection=default_collection,
+    query_text="test 1",
+    num_results=2
+)
+
+print("Result:", result)
