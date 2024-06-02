@@ -4,11 +4,11 @@ class chromaDbRepository:
 
     currentId = 1
 
-    def create_collection(collection_name = "DefautDatabaseCollection"):
+    def create_collection(self, collection_name="DefautDatabaseCollection"):
         chroma_client = chromadb.Client()
-        return chroma_client.create_collection(name=collection_name)
+        return chroma_client.get_or_create_collection(name=collection_name)
 
-    def add_document(collection, list_of_documents):
+    def add_document(self, collection, list_of_documents):
 
         ids = []
         idCount = 0
@@ -22,7 +22,7 @@ class chromaDbRepository:
         )
         return True
 
-    def query(collection, query_text, num_results):
+    def query(self, collection, query_text, num_results):
         if collection is None:
             print("missing collection")
             return False
@@ -32,3 +32,18 @@ class chromaDbRepository:
             n_results=num_results  # how many results to return
         )
 
+
+db = chromaDbRepository
+default_collection = db.create_collection()
+
+db.add_document(
+    collection=default_collection,
+    list_of_documents=["test doc1", "test doc2", "test doc3", "Test 1"])
+
+result = db.query(
+    collection=default_collection,
+    query_text="test 1",
+    num_results=2
+)
+
+print("Result:", result)
