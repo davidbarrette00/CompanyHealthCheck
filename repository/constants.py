@@ -35,3 +35,8 @@ sentiment_columns = [
     "relevance_score",
     "ticker_sentiment_score"
 ]
+
+#prompts to AI
+ai_overview_prompt = "Here is some relevant overview information for a company. Give me a short summary describing " \
+                     "the percieved health of the company, finishing with a score between 0 and 1 with 5 significant digits, " \
+                     "0 meaning sell the company stock, 0.5 meaning hold the company stock, and 1 meaning buy the company stock: "
