@@ -33,6 +33,5 @@ overview_columns = [
 sentiment_columns = [
     "ticker",
     "relevance_score",
-    "ticker_sentiment_score",
-    "ticker_sentiment_label"
+    "ticker_sentiment_score"
 ]

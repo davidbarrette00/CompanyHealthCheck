@@ -1,5 +1,7 @@
 import csv
+import numbers
 import os
+import traceback
 
 import requests
 
@@ -72,12 +74,18 @@ def append_to_csv(ticker, data, type_of_csv):
             case constants.csv_overview:
                 if new_file:
                     writer.writerow(constants.overview_columns)
-                writer.writerow(clean_overview_data(data))
+                try:
+                    writer.writerow(clean_overview_data(data))
+                except Exception as e:
+                    print("ERROR: Overview data error for ticker: ", ticker, traceback.format_exc())
 
             case constants.csv_sentiment:
                 if new_file:
                     writer.writerow(constants.sentiment_columns)
-                writer.writerow(clean_sentiment_data(ticker, data))
+                try:
+                    writer.writerow(clean_sentiment_data(ticker, data))
+                except Exception as e:
+                    print("ERROR: Sentiment data error for ticker: ", ticker, traceback.format_exc())
 
 
 
@@ -91,12 +99,38 @@ def clean_overview_data(data):
 
 def clean_sentiment_data(ticker, data):
     print("Cleaning sentiment data")
-    data_for_csv = []
+
+    all_sentiment_data = {}
     for article in data['feed']:
         for company_sentiment in article['ticker_sentiment']:
             if company_sentiment['ticker'] == ticker:
                 for key in constants.sentiment_columns:
-                    data_for_csv.append(company_sentiment[key])
+                    if key in all_sentiment_data:
+                        try:
+                            all_sentiment_data[key].append(float(company_sentiment[key]))
+                        except:
+                            all_sentiment_data[key].append(company_sentiment[key])
+                    else:
+                        try:
+                            all_sentiment_data[key] = [float(company_sentiment[key])]
+                        except:
+                            all_sentiment_data[key] = [company_sentiment[key]]
                 break
+
+
+    data_for_csv = []
+    if len(all_sentiment_data) == 0:
+        print("No sentiment data found for ticker: ", ticker)
+        data_for_csv.append(ticker)
+    else:
+        average_sentiment = {}
+        for key in constants.sentiment_columns:
+            if isinstance(all_sentiment_data[key][0], str):
+                average_sentiment[key] = all_sentiment_data[key][0]
+            else:
+                average_sentiment[key] = sum(float(i) for i in all_sentiment_data[key]) / len(all_sentiment_data[key])
+
+        for key in constants.sentiment_columns:
+            data_for_csv.append(average_sentiment[key])
 
     return data_for_csv
